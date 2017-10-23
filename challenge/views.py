@@ -71,14 +71,11 @@ class ServingList(generics.ListCreateAPIView):
     def get(self, request, age, gender):
         queryset = self.get_queryset()
         queryset = queryset.filter(age_lower__lte = age, age_upper__gte = age,gender=gender)
-        queryset2 = FoodEntry.objects.all()
 
         numList = []
         food_category_list = queryset.values('food_category_id').all()
         for obj in food_category_list:
             numList.append(obj['food_category_id'])
-
-        print(numList)
 
         queryset2 = FoodEntry.objects.filter(food_category_id__in=numList)
 

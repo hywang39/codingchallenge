@@ -72,20 +72,52 @@
                             for (var i = 0; i < serving_result.length; i++) {
                                 food_group_dict[serving_result[i]['food_category_id']['_id'].toString()] = [serving_result[i]['food_category_id']['food_category_long_name'], serving_result[i]['serving_number']];
                             }
+                            var foodentry_by_category = [[], [], [], []];
 
-
-                            var htmlString = "<table border='1'>";
-                            htmlString += '<tr><th>Category</th><th>Detail</th><th>Servings</th><th>Serving Size</th><tr>';
                             for (var i = 0; i < foodentry_result.length; i++) {
-                                htmlString += "<tr><td>" + food_group_dict[foodentry_result[i]['food_category_id']][0] + "</td><td>"
-                                    + foodentry_result[i]['food_name'] + "</td><td>" + foodentry_result[i]['serving_size'] + "</td><td>"
-                                    + food_group_dict[foodentry_result[i]['food_category_id']][1] + "</td></tr>";
+                                if (foodentry_result[i]['food_category_id'] == 1) {
+                                    foodentry_by_category[0].push(foodentry_result[i]);
+                                }
+                                else if (foodentry_result[i]['food_category_id'] == 2) {
+
+                                    foodentry_by_category[1].push(foodentry_result[i]);
+                                }
+                                else if (foodentry_result[i]['food_category_id'] == 3) {
+
+                                    foodentry_by_category[2].push(foodentry_result[i]);
+                                }
+                                else {
+                                    foodentry_by_category[3].push(foodentry_result[i]);
+                                }
                             }
 
-                            htmlString += '</table>';
+                            var random_by_category = [];
+                            console.log(foodentry_by_category);
+
+                            for (var i = 0; i < foodentry_by_category.length; i++) {
+                                random_by_category.push(Math.floor(Math.random() * foodentry_by_category[i].length));
+                            }
+                            var short_htmlString = "<table border='1'>";
+                            short_htmlString += '<tr><th>Category</th><th>Detail</th><th>Servings</th><th>Serving Size</th><tr>';
+                            for (var i = 0; i < serving_result.length; i++) {
+                                short_htmlString += "<tr><td>" + food_group_dict[foodentry_by_category[i][random_by_category[i]]['food_category_id']][0] + "</td><td>"
+                                    + foodentry_by_category[i][random_by_category[i]]['food_name'] + "</td><td>" + foodentry_by_category[i][random_by_category[i]]['serving_size'] + "</td><td>"
+                                    + food_group_dict[foodentry_by_category[i][random_by_category[i]]['food_category_id']][1] + "</td></tr>";
+                            }
+
+                            {#                            var htmlString = "<table border='1'>";#}
+                            {#                            htmlString += '<tr><th>Category</th><th>Detail</th><th>Servings</th><th>Serving Size</th><tr>';#}
+                            {#                            for (var i = 0; i < foodentry_result.length; i++) {#}
+                            {#                                htmlString += "<tr><td>" + food_group_dict[foodentry_result[i]['food_category_id']][0] + "</td><td>"#}
+                            {#                                    + foodentry_result[i]['food_name'] + "</td><td>" + foodentry_result[i]['serving_size'] + "</td><td>"#}
+                            {#                                    + food_group_dict[foodentry_result[i]['food_category_id']][1] + "</td></tr>";#}
+                            {#                            }#}
+
+                            {#                            htmlString += '</table>';#}
+                            short_htmlString += '</table>'
                             var notificationString = 'You have selected ' + params.gender + ', age ' + params.age
                                 + '. The recommendation of daily food is below:';
-                            document.getElementById('table_div').innerHTML = htmlString;
+                            document.getElementById('table_div').innerHTML = short_htmlString;
                             document.getElementById('notification_div').innerHTML = notificationString;
                         }
                     })
