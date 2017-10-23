@@ -1,0 +1,106 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"
+          integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/cust_css.css' %}">
+    <script src="{% static 'js/jquery-3.2.1.min.js' %}"></script>
+</head>
+<body>
+<script>
+    $(document).ready(function () {
+        $("p").click(function () {
+            alert("The paragraph was clicked.");
+        });
+    });
+</script>
+
+<div class="container">
+
+    <h1>This is main page</h1>
+    <form id="myForm" onsubmit="return validation()">
+        <input type="radio" name="gender" value="male"> Male<br>
+        <input type="radio" name="gender" value="female"> Female<br>
+        <input type="number" id="age"><br>
+        <input type="submit"></input>
+    </form>
+
+
+    <script>
+        function validation() {
+            var bool = true;
+
+            if (!document.querySelector('input[name="gender"]:checked').value) {
+                bool = false;
+            }
+
+            if (!document.getElementById('age')) {
+                bool = false;
+            }
+            return bool;
+        }
+
+        $(document).ready(function () {
+            $('#myForm').on('submit', function (e) {
+                if (validation()) {
+                    e.preventDefault();
+                    var params = {};
+                    params.gender = document.querySelector('input[name="gender"]:checked').value;
+                    params.age = document.getElementById('age').value;
+                    {#            console.log(params.gender + ' , ' + params.age);#}
+
+                    $.ajax({
+                        type: 'GET',
+                        url: 'http://localhost:8000/servings/' + params.gender + '/' + params.age.toString(),
+                        contentType: "application/json",
+                        data: {
+                            format: 'json'
+                        },
+                        error: function () {
+                            alert('failed');
+                        },
+                        dataType: 'json',
+                        success: function (response) {
+                            foodentry_result = response['foodentry'];
+                            serving_result = response['serving'];
+
+                            var food_group_dict = {};
+
+                            for (var i = 0; i < serving_result.length; i++) {
+                                food_group_dict[serving_result[i]['food_category_id']['_id'].toString()] = [serving_result[i]['food_category_id']['food_category_long_name'], serving_result[i]['serving_number']];
+                            }
+
+
+                            var htmlString = "<table border='1'>";
+                            htmlString += '<tr><th>Category</th><th>Detail</th><th>Servings</th><th>Serving Size</th><tr>';
+                            for (var i = 0; i < foodentry_result.length; i++) {
+                                htmlString += "<tr><td>" + food_group_dict[foodentry_result[i]['food_category_id']][0] + "</td><td>"
+                                    + foodentry_result[i]['food_name'] + "</td><td>" + foodentry_result[i]['serving_size'] + "</td><td>"
+                                    + food_group_dict[foodentry_result[i]['food_category_id']][1] + "</td></tr>";
+                            }
+
+                            htmlString += '</table>';
+                            var notificationString = 'You have selected ' + params.gender + ', age ' + params.age
+                                + '. The recommendation of daily food is below:';
+                            document.getElementById('table_div').innerHTML = htmlString;
+                            document.getElementById('notification_div').innerHTML = notificationString;
+                        }
+                    })
+                }
+
+
+            })
+        });
+
+
+    </script>
+    <div id="notification_div"></div>
+    <div id="table_div"></div>
+</div>
+
+</body>
+</html>
+
